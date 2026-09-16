@@ -1,0 +1,18 @@
+{
+  "platform_weights": {
+    "tiktok": {
+      "hook": 0.34,
+      "completion": 0.354,
+      "loopability": 0.0775,
+      "peak_end": 0.1265,
+      "arousal": 0.102
+    },
+    "reels": {
+      "hook": 0.26,
+      "completion": 0.3692,
+      "loopability": 0.0562,
+      "peak_end": 0.1703,
+      "arousal": 0.1443
+    }
+  }
+}

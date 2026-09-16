@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NeuroViral — local virality predictor</title>
+<style>
+  :root{
+    --bg:#0e1013; --panel:#16191f; --ink:#e7eaf0; --muted:#8a91a0; --border:#242832;
+    --reward:#d9a441; --attention:#4c8df6; --emotion:#e05b48;
+    --aversion:#a86fd0; --language:#33b6a4; --retention:#4fb477; --accent:#4c7ef0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+  header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;
+    align-items:center;gap:14px;flex-wrap:wrap}
+  header .brand{display:flex;align-items:center;gap:10px}
+  header .mark{width:22px;height:22px;border-radius:5px;
+    background:linear-gradient(145deg,var(--accent),#2f5bc0);flex:none}
+  header h1{margin:0;font-size:17px;font-weight:650;letter-spacing:.2px}
+  header .tag{color:var(--muted);font-size:13px}
+  .disclaimer{background:#14171d;border:1px solid var(--border);border-left:3px solid var(--accent);
+    color:var(--muted);padding:10px 14px;font-size:12px;border-radius:6px;margin:14px 24px;line-height:1.55}
+  .disclaimer b{color:var(--ink);font-weight:600}
+  main{display:grid;grid-template-columns:minmax(320px,1fr) minmax(360px,1.2fr);
+    gap:18px;padding:18px 24px}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px}
+  video{width:100%;border-radius:10px;background:#000;max-height:420px}
+  .drop{border:1px dashed #2f3644;border-radius:12px;padding:26px;text-align:center;
+    color:var(--muted);cursor:pointer}
+  .drop.hover{border-color:var(--accent);color:var(--ink)}
+  .controls{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center}
+  select,button{background:#1b1f27;color:var(--ink);
+    border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px}
+  button.primary{background:var(--accent);border-color:var(--accent);cursor:pointer;font-weight:600}
+  .gauges{display:flex;gap:14px;flex-wrap:wrap}
+  .gauge{flex:1;min-width:150px;background:#12151b;border:1px solid var(--border);
+    border-radius:10px;padding:14px;text-align:center}
+  .gauge .num{font-size:34px;font-weight:700}
+  .gauge .band{color:var(--muted);font-size:12px}
+  .gauge .plat{font-size:12px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+  .subgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:8px;margin-top:14px}
+  .sub{background:#12151b;border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center}
+  .sub .v{font-size:19px;font-weight:600}.sub .l{font-size:10.5px;color:var(--muted)}
+  .sub.sub-hook{grid-column:1/-1;text-align:left}
+  .hookrow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .hookrow .v{font-size:19px;font-weight:600}
+  .hookrow .parts{display:flex;gap:12px;font-size:11.5px;color:var(--muted)}
+  .hookrow .parts b{color:var(--ink);font-weight:600}
+  canvas{width:100%;display:block;border-radius:8px;background:#101319}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;font-size:12px;color:var(--muted)}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
+  .recs{margin-top:6px}
+  .rec{background:#12151b;border:1px solid var(--border);border-left:3px solid var(--accent);
+    border-radius:8px;padding:10px 12px;margin-bottom:9px;cursor:pointer}
+  .rec:hover{border-color:var(--accent)}
+  .rec .h{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+  .rec .ts{color:var(--accent);font-size:12px}
+  .rec .d{color:var(--muted);font-size:12.5px;margin-top:4px}
+  .lift{background:#1d2b1f;color:#9fe6a0;border-radius:6px;padding:1px 7px;font-size:11px}
+  h3{margin:2px 0 10px;font-size:14px;letter-spacing:.5px;color:#c3ccdd}
+  .muted{color:var(--muted);font-size:12px}
+  .metabar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .metabar .chip{background:#12151b;border:1px solid var(--border);border-radius:20px;
+    padding:4px 11px;font-size:11.5px;color:var(--muted)}
+  .metabar .chip b{color:var(--ink);font-weight:600}
+  .metabar .chip.ok{border-color:#2b5e3a;color:#9fe6a0}
+  .metabar .chip.warn{border-color:#5e4b2b;color:#e6cf9f}
+  .scalenote{font-size:12px;color:var(--muted);margin:8px 0 2px;line-height:1.5}
+  .scalenote b{color:var(--ink)}
+  .scale{display:flex;height:8px;border-radius:5px;overflow:hidden;margin:8px 0 4px}
+  .scale span{flex:1}
+  .scaleticks{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted)}
+  .glossary{margin-top:10px;font-size:12.5px}
+  .glossary details{background:#12151b;border:1px solid var(--border);border-radius:8px;padding:6px 12px}
+  .glossary summary{cursor:pointer;color:#c3ccdd;font-weight:600;font-size:12.5px}
+  .glossary dl{margin:10px 0 2px;display:grid;grid-template-columns:auto 1fr;gap:6px 12px}
+  .glossary dt{font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .glossary dt i{display:inline-block;width:10px;height:10px;border-radius:2px}
+  .glossary dd{margin:0;color:var(--muted);line-height:1.45}
+  .spinner{display:none;margin:14px auto;border:3px solid #2a3346;border-top-color:var(--accent);
+    border-radius:50%;width:26px;height:26px;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .progress{display:none;margin:14px 0}
+  .pbar{height:8px;background:#12151b;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+  .pfill{height:100%;width:0;background:var(--accent);transition:width .15s ease}
+  .pct{margin-top:6px;font-size:12px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span class="mark"></span>
+    <h1>NeuroViral</h1>
+  </div>
+  <span class="tag">Local short-form virality analysis · TikTok &amp; Reels</span>
+</header>
+<div class="disclaimer">
+  Research-informed <b>simulation</b>, not a brain scan. Real audio/visual signals are mapped onto a
+  model of neural response grounded in neuroforecasting research (Falk et al. 2012; Tong et al. 2020,
+  PNAS). Scores are relative optimization guidance with a confidence band — not guaranteed views.
+</div>
+
+<main>
+  <section class="panel">
+    <div id="drop" class="drop">
+      <div style="font-size:15px">Drop a short-form clip here, or click to choose</div>
+      <div class="muted" style="margin-top:6px">runs 100% locally · mp4 / mov / webm</div>
+      <input id="file" type="file" accept="video/*" style="display:none" />
+    </div>
+    <div class="controls">
+      <select id="platform">
+        <option value="both">Both platforms</option>
+        <option value="tiktok">TikTok</option>
+        <option value="reels">Reels</option>
+      </select>
+      <select id="ctype">
+        <option value="auto">Auto content-type</option>
+        <option value="talking_head">Talking head</option>
+        <option value="edit">Edit / montage</option>
+        <option value="vlog">Vlog</option>
+      </select>
+      <button id="run" class="primary">Analyze</button>
+    </div>
+    <div id="spinner" class="spinner"></div>
+    <div id="progress" class="progress">
+      <div class="pbar"><div id="pfill" class="pfill"></div></div>
+      <div id="pct" class="pct">0%</div>
+    </div>
+    <video id="player" controls playsinline></video>
+  </section>
+
+  <section class="panel">
+    <h3>PLATFORM SCORES <span class="muted">— out of 100</span></h3>
+    <div id="gauges" class="gauges"><span class="muted">Upload a clip to see scores.</span></div>
+    <div class="scalenote">
+      Each platform is scored <b>0–100</b> — a <b>relative optimization score</b> (how well the
+      clip's signals match what TikTok/Reels reward), <b>not</b> a predicted view count. The
+      <b>band</b> is a confidence range; <b>conf</b> is how sure the model is.
+    </div>
+    <div class="scale">
+      <span style="background:#ff6b6b"></span><span style="background:#e6a15a"></span>
+      <span style="background:#e6d15a"></span><span style="background:#9fe6a0"></span>
+    </div>
+    <div class="scaleticks">
+      <span>0 · weak</span><span>40 · mixed</span><span>60 · strong</span><span>75+ high potential</span><span>100</span>
+    </div>
+    <div id="subs" class="subgrid"></div>
+    <div id="meta" class="metabar"></div>
+
+    <h3 style="margin-top:20px">SYNCED BRAIN-ACTIVATION TIMELINE <span class="muted">(time in seconds)</span></h3>
+    <div class="legend">
+      <span><i style="background:var(--reward)"></i>Reward/NAcc</span>
+      <span><i style="background:var(--attention)"></i>Attention</span>
+      <span><i style="background:var(--emotion)"></i>Emotion/Arousal</span>
+      <span><i style="background:var(--aversion)"></i>Aversion</span>
+      <span><i style="background:var(--language)"></i>Language/Social</span>
+    </div>
+    <div class="glossary">
+      <details>
+        <summary>What do these channels mean?</summary>
+        <dl>
+          <dt><i style="background:var(--reward)"></i>Reward</dt>
+          <dd><b>Anticipation / curiosity</b> (nucleus accumbens). Driven by hooks, open loops,
+            novelty and build-up to a payoff. High reward = viewers want to see what happens next.</dd>
+          <dt><i style="background:var(--attention)"></i>Attention</dt>
+          <dd><b>Visual salience</b> that holds the eye. Driven by motion, cut rate, face size,
+            contrast and on-screen text — this is what wins the first-3s hold.</dd>
+          <dt><i style="background:var(--emotion)"></i>Emotion</dt>
+          <dd><b>Emotional arousal</b> (amygdala/insula). Driven by audio energy, vocal
+            pitch/pace, expression intensity and sentiment. High arousal predicts sharing.</dd>
+          <dt><i style="background:var(--aversion)"></i>Aversion</dt>
+          <dd><b>Scroll-away / drop-off risk</b> (anterior insula). Raised by dead air, slow
+            starts, low motion, monotone and over-long shots. <b>Lower is better.</b></dd>
+          <dt><i style="background:var(--language)"></i>Language</dt>
+          <dd><b>Meaning &amp; relatability</b> (MPFC/language areas). Driven by self-reference,
+            clarity, a clear message/CTA and novelty — this drives comments and sharing intent.</dd>
+        </dl>
+        <div class="muted" style="margin-top:6px">These are a research-informed <b>simulation</b>
+          of neural response, not a real brain scan.</div>
+      </details>
+    </div>
+    <canvas id="timeline" width="900" height="262"></canvas>
+
+    <h3 style="margin-top:20px">PREDICTED RETENTION <span class="muted">(drop-off zones highlighted, with time ranges)</span></h3>
+    <canvas id="retention" width="900" height="140"></canvas>
+
+    <h3 style="margin-top:20px">RECOMMENDATIONS <span class="muted">(click to jump the player)</span></h3>
+    <div id="recs" class="recs"></div>
+  </section>
+</main>
+
+<script>
+const CH = ["reward","attention","emotion","aversion","language"];
+const COL = {reward:"#ffd166",attention:"#4cc9f0",emotion:"#ff6b6b",
+  aversion:"#b5179e",language:"#80ffdb",retention:"#a3ff9e"};
+let DATA = null;
+
+const $ = s => document.querySelector(s);
+const drop = $("#drop"), fileInput = $("#file"), player = $("#player");
+
+drop.addEventListener("click", () => fileInput.click());
+["dragover","dragenter"].forEach(e => drop.addEventListener(e, ev=>{ev.preventDefault();drop.classList.add("hover")}));
+["dragleave","drop"].forEach(e => drop.addEventListener(e, ev=>{ev.preventDefault();drop.classList.remove("hover")}));
+drop.addEventListener("drop", ev => { if(ev.dataTransfer.files[0]) loadLocal(ev.dataTransfer.files[0]); });
+fileInput.addEventListener("change", () => { if(fileInput.files[0]) loadLocal(fileInput.files[0]); });
+
+let pending = null;
+function loadLocal(f){ pending = f; player.src = URL.createObjectURL(f);
+  drop.querySelector("div").textContent = "Selected: " + f.name; }
+
+$("#run").addEventListener("click", analyze);
+
+function analyze(){
+  if(!pending){ alert("Choose a clip first."); return; }
+  const fd = new FormData();
+  fd.append("file", pending);
+  const url = "/analyze?platform="+$("#platform").value+"&content_type="+$("#ctype").value;
+  const prog=$("#progress"), fill=$("#pfill"), pct=$("#pct"), run=$("#run");
+  prog.style.display="block"; fill.style.width="0%"; pct.textContent="Uploading… 0%";
+  run.disabled=true;
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", url);
+  // Upload byte-progress (fetch() can't report this; XHR can).
+  xhr.upload.addEventListener("progress", e=>{
+    if(!e.lengthComputable) return;
+    const p = Math.round(e.loaded/e.total*100);
+    fill.style.width = p+"%";
+    pct.textContent = p<100 ? ("Uploading… "+p+"%") : "Uploaded — analyzing…";
+  });
+  // Upload done; server is now analyzing (no byte stream for that phase).
+  xhr.upload.addEventListener("load", ()=>{
+    fill.style.width="100%"; pct.textContent="Uploaded — analyzing…";
+    $("#spinner").style.display="block";
+  });
+  xhr.addEventListener("load", ()=>{
+    run.disabled=false; $("#spinner").style.display="none";
+    if(xhr.status>=200 && xhr.status<300){
+      try{ DATA = JSON.parse(xhr.responseText); }
+      catch(err){ pct.textContent="Failed to parse result."; return; }
+      fill.style.width="100%"; pct.textContent="Done ✓";
+      render();
+      setTimeout(()=>{ prog.style.display="none"; }, 1500);
+    }else{
+      let msg = xhr.statusText;
+      try{ msg = JSON.parse(xhr.responseText).detail || msg; }catch(_){}
+      pct.textContent = "Analysis failed: " + msg;
+    }
+  });
+  xhr.addEventListener("error", ()=>{
+    run.disabled=false; $("#spinner").style.display="none";
+    pct.textContent="Network error during upload.";
+  });
+  xhr.send(fd);
+}
+
+const AXIS_PAD = 18;   // bottom room reserved for the time axis
+function fmtTime(s){
+  s = Math.max(0, Math.round(s));
+  if(s>=60){ const m=Math.floor(s/60), ss=s%60; return m+":"+String(ss).padStart(2,"0"); }
+  return s+"s";
+}
+
+function render(){
+  renderGauges(); renderSubs(); renderMeta(); renderRecs();
+  drawTimeline(); drawRetention();
+}
+
+function renderMeta(){
+  const d = DATA, dy = d.dynamics, m = $("#meta");
+  const nd = d.degraded_extractors|0;
+  const chips = [
+    `<span class="chip">Duration <b>${fmtTime(d.duration)}</b></span>`,
+    `<span class="chip">Type <b>${d.content_type}</b></span>`,
+    d.calibrated_weights
+      ? `<span class="chip ok">Calibrated to your posts</span>`
+      : `<span class="chip">Uncalibrated (research defaults)</span>`,
+    (nd>0 ? `<span class="chip warn">${nd} extractor${nd===1?"":"s"} degraded</span>`
+          : `<span class="chip ok">All extractors active</span>`),
+    `<span class="chip">Arousal peak <b>${fmtTime(dy.arousal_peak_time)}</b></span>`,
+    `<span class="chip">Drop-off zones <b>${(dy.dropoff_zones||[]).length}</b></span>`,
+  ];
+  m.innerHTML = chips.join("");
+}
+
+// Vertical gridlines + second/mm:ss labels along the bottom of a canvas.
+function drawTimeAxis(ctx, W, H, dur){
+  const n = 6, plotH = H - AXIS_PAD;
+  ctx.save();
+  ctx.font = "10px sans-serif"; ctx.textAlign = "center";
+  for(let i=0;i<=n;i++){
+    const t = dur*i/n, x = (t/dur)*W;
+    ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,plotH); ctx.stroke();
+    ctx.fillStyle = "#7f8ba0";
+    const lx = i===0 ? x+14 : (i===n ? x-14 : x);
+    ctx.fillText(fmtTime(t), lx, H-5);
+  }
+  ctx.restore();
+}
+
+function renderGauges(){
+  const g = $("#gauges"); g.innerHTML = "";
+  for(const [p,s] of Object.entries(DATA.scores)){
+    const el = document.createElement("div"); el.className="gauge";
+    el.innerHTML = `<div class="plat">${p}</div>
+      <div class="num">${s.score.toFixed(0)}</div>
+      <div class="band">band ${s.band[0].toFixed(0)}–${s.band[1].toFixed(0)} · conf ${s.confidence.toFixed(2)}</div>`;
+    g.appendChild(el);
+  }
+}
+function renderSubs(){
+  const d = DATA.dynamics;
+  const c = $("#subs"); c.innerHTML = "";
+  // Hook spans the full row with its visual/text/audio breakdown.
+  const hook = document.createElement("div"); hook.className="sub sub-hook";
+  hook.innerHTML = `<div class="hookrow">
+      <span class="v">${(d.hook*100).toFixed(0)}</span>
+      <span class="l">Hook (0–3s)</span>
+      <span class="parts">
+        <span>visual <b>${(d.visual_hook*100).toFixed(0)}</b></span>
+        <span>text <b>${(d.text_hook*100).toFixed(0)}</b></span>
+        <span>audio <b>${(d.audio_hook*100).toFixed(0)}</b></span>
+      </span></div>`;
+  c.appendChild(hook);
+  const items = [["Completion", d.predicted_completion*100],["Loop", d.loopability*100],
+    ["Peak-end", d.peak_end*100],["Arousal", d.arousal*100],
+    ["Uniqueness", d.uniqueness*100],["Storytelling", d.storytelling*100]];
+  for(const [l,v] of items){
+    const el = document.createElement("div"); el.className="sub";
+    el.innerHTML = `<div class="v">${v.toFixed(0)}</div><div class="l">${l}</div>`;
+    c.appendChild(el);
+  }
+}
+function renderRecs(){
+  const c = $("#recs"); c.innerHTML = "";
+  DATA.recommendations.forEach(r=>{
+    const el = document.createElement("div"); el.className="rec";
+    el.innerHTML = `<div class="h"><span>${r.title}</span>
+      <span class="lift">+${r.est_lift.toFixed(0)}</span></div>
+      ${r.timestamp?`<div class="ts">${r.timestamp}</div>`:""}
+      <div class="d">${r.detail}</div>`;
+    if(r.t_start!=null){ el.addEventListener("click", ()=>{ player.currentTime=r.t_start; player.play(); }); }
+    c.appendChild(el);
+  });
+}
+
+function drawTimeline(){
+  const cv = $("#timeline"), ctx = cv.getContext("2d");
+  const W=cv.width, H=cv.height, times=DATA.times, dur=DATA.duration;
+  ctx.clearRect(0,0,W,H);
+  drawTimeAxis(ctx,W,H,dur);
+  const trackH = (H-AXIS_PAD)/CH.length;
+  CH.forEach((ch,i)=>{
+    const y0 = i*trackH;
+    ctx.fillStyle = "rgba(255,255,255,0.02)"; ctx.fillRect(0,y0,W,trackH-2);
+    const arr = DATA.channels[ch];
+    ctx.beginPath();
+    arr.forEach((v,j)=>{
+      const x = (times[j]/dur)*W;
+      const y = y0 + trackH-2 - v*(trackH-6);
+      j===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle = COL[ch]; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle = COL[ch]; ctx.globalAlpha=0.12;
+    ctx.lineTo(W,y0+trackH-2); ctx.lineTo(0,y0+trackH-2); ctx.closePath(); ctx.fill();
+    ctx.globalAlpha=1;
+    ctx.fillStyle="#9aa6bd"; ctx.font="11px sans-serif"; ctx.textAlign="left";
+    ctx.fillText(ch, 6, y0+13);
+  });
+  drawPlayhead(ctx,W,H-AXIS_PAD);
+}
+function drawRetention(){
+  const cv=$("#retention"), ctx=cv.getContext("2d");
+  const W=cv.width,H=cv.height,times=DATA.times,dur=DATA.duration;
+  const plotH = H - AXIS_PAD;
+  ctx.clearRect(0,0,W,H);
+  drawTimeAxis(ctx,W,H,dur);
+  (DATA.dynamics.dropoff_zones||[]).forEach(z=>{
+    const x0=(z.start/dur)*W, x1=(z.end/dur)*W;
+    ctx.fillStyle="rgba(181,23,158,0.22)"; ctx.fillRect(x0,0,Math.max(2,x1-x0),plotH);
+    ctx.fillStyle="#e879d0"; ctx.font="9px sans-serif"; ctx.textAlign="left";
+    ctx.fillText(`${fmtTime(z.start)}–${fmtTime(z.end)}`, x0+3, 11);
+  });
+  const arr=DATA.retention_curve;
+  ctx.beginPath();
+  arr.forEach((v,j)=>{ const x=(times[j]/dur)*W, y=plotH-4-v*(plotH-10);
+    j===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  ctx.strokeStyle=COL.retention; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle="#9aa6bd"; ctx.font="11px sans-serif"; ctx.textAlign="left";
+  ctx.fillText("100%",4,12); ctx.fillText("0%",4,plotH-4);
+  drawPlayhead(ctx,W,plotH);
+}
+function drawPlayhead(ctx,W,H){
+  if(!DATA) return;
+  const x = (Math.min(player.currentTime,DATA.duration)/DATA.duration)*W;
+  ctx.strokeStyle="rgba(255,255,255,0.85)"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+}
+player.addEventListener("timeupdate", ()=>{ if(DATA){ drawTimeline(); drawRetention(); }});
+</script>
+</body>
+</html>
