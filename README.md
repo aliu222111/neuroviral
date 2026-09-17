@@ -1,21 +1,21 @@
 # NeuroViral
 
-A **fully-local** tool that "watches and listens" to a short-form video and predicts how it might perform on TikTok and Instagram Reels. It extracts real audio/visual signals, maps them onto a research-grounded model of neural/attention response, and returns per-platform virality scores plus specific, timestamped fixes.
+A fully local tool that watches and listens to a short-form video and predicts how it might perform on TikTok and Instagram Reels. It extracts audio and visual signals, maps them onto a model of neural attention response taken from published research, and returns per-platform virality scores along with specific, timestamped fixes.
 
-> ⚠️ **Honest framing — read this first.** NeuroViral is a **research-informed SIMULATION / PROXY, not a real brain scan.** No software can image a hypothetical viewer's brain. What this tool does is extract measurable features from your video and map them onto a model of neural response grounded in published *neuroforecasting* research. Scores are **relative optimization guidance with a confidence band, not guaranteed views.**
+> **Read this before anything else.** NeuroViral is a simulation, not a brain scan. No software can image a hypothetical viewer's brain. What it actually does is pull measurable features out of your video and map them onto a model of neural response drawn from published neuroforecasting work. The scores are relative optimization guidance with a confidence band attached. They are not a prediction of how many views you will get.
 
-Everything runs on your machine. There are **no network/API calls at score time** — private and free per run.
+Everything runs on your machine. Nothing touches the network at score time, so each run is private and costs nothing.
 
 ---
 
-## The science it's grounded in
+## The science it's built on
 
-Neuroforecasting studies found that specific brain responses at video onset predict *population-level* view frequency and duration:
+Neuroforecasting studies found that specific brain responses at video onset predict view frequency and duration at the population level:
 
-- **Falk, Berkman & Lieberman (2012),** *Psychological Science* — a "neural focus group": group-level nucleus accumbens (NAcc, reward/anticipation) ↑ and anterior insula (AIns, aversion) ↓ forecast population media effects.
-- **Tong, Chen, Cikara, Zaki, Genevsky, Falk & Knutson (2020),** *PNAS* — brain activity (NAcc ↑, AIns ↓, MPFC) at video onset forecasts aggregate YouTube view frequency/duration above conventional measures.
+- Falk, Berkman & Lieberman (2012), *Psychological Science*. A "neural focus group": group-level nucleus accumbens (NAcc, reward/anticipation) up and anterior insula (AIns, aversion) down forecast population media effects.
+- Tong, Chen, Cikara, Zaki, Genevsky, Falk & Knutson (2020), *PNAS*. Brain activity at video onset (NAcc up, AIns down, MPFC) forecasts aggregate YouTube view frequency and duration better than conventional measures do.
 
-NeuroViral models those systems as **five neural channels** activated over time by features it can measure locally, then translates their dynamics into platform scores using documented TikTok/Reels ranking behavior (first-3s watch-time is the strongest signal; 80%+ completion = high viral potential; replays/loops, saves, and shares dominate).
+NeuroViral models those systems as five neural channels, activated over time by features it can measure locally, then translates their dynamics into platform scores using documented TikTok and Reels ranking behavior: first-3s watch time is the strongest signal, 80%+ completion indicates high viral potential, and replays, saves and shares dominate the rest.
 
 | Channel | Brain system | Driven by |
 |---|---|---|
@@ -25,13 +25,13 @@ NeuroViral models those systems as **five neural channels** activated over time 
 | Aversion / Drop-off | anterior insula (inverse) | dead air, slow starts, low motion + monotone, over-long shots |
 | Language / Social meaning | MPFC / language areas | semantic novelty, self-reference/relatability, clarity, CTA |
 
-From the channels it derives **hook strength (0–3s)**, a **predicted retention curve / completion %**, **loopability**, and **peak-end shareability**, which become the TikTok and Reels scores.
+From those channels it derives hook strength over the first 3 seconds, a predicted retention curve and completion percentage, loopability, and peak-end shareability. Those become the TikTok and Reels scores.
 
 ---
 
 ## Install
 
-Requires **Python 3.11+** and **ffmpeg** (a system dependency).
+Requires Python 3.11+ and ffmpeg, which is a system dependency.
 
 ```bash
 # ffmpeg (macOS)
@@ -47,14 +47,14 @@ Install variants (extras are additive):
 
 | Command | Installs | Use when |
 |---|---|---|
-| `pip install -e ".[all]"` | everything (ml + web + calibrate) | **recommended** — full-fidelity scoring |
+| `pip install -e ".[all]"` | everything (ml + web + calibrate) | recommended, for full-fidelity scoring |
 | `pip install -e ".[ml]"` | the real extractors (Whisper, librosa, OpenCV, mediapipe, sentence-transformers) | CLI scoring without the dashboard |
 | `pip install -e ".[web]"` | FastAPI + uvicorn dashboard | dashboard only |
-| `pip install -e .` | **numpy only** | minimal — every extractor runs in degraded/neutral mode, so scores are low-confidence placeholders |
+| `pip install -e .` | numpy only | minimal, and every extractor runs in degraded mode, so scores are low-confidence placeholders |
 
-> ⚠️ The bare `pip install -e .` does **not** pull the ML models — with it, all extractors degrade to neutral output and scores carry low confidence. Install `.[ml]` or `.[all]` for real scoring.
+> The bare `pip install -e .` does not pull the ML models. Without them every extractor falls back to neutral output and the scores carry low confidence, so install `.[ml]` or `.[all]` if you want real scoring.
 
-**On first real use the ML libraries download several GB of model weights** (Whisper for speech, sentence-embeddings for text novelty, etc.), cached locally thereafter. If a model or optional dependency is still missing, the matching extractor **degrades gracefully** to a neutral signal and the run continues — the report notes how many extractors degraded and lowers its confidence band accordingly.
+The first real run downloads several GB of model weights (Whisper for speech, sentence-embeddings for text novelty, and so on), which are cached locally afterwards. If a model or an optional dependency is still missing, the matching extractor degrades to a neutral signal and the run carries on. The report tells you how many extractors degraded and widens its confidence band to match.
 
 ---
 
@@ -66,7 +66,7 @@ Install variants (extras are additive):
 neuroviral score clip.mp4 --platform both
 ```
 
-Prints overall + per-platform scores with a confidence band, sub-scores (hook — broken down into **visual / text / audio** components — predicted completion %, loopability, peak-end, arousal, **uniqueness**, and **storytelling / narrative-arc quality**), a text sparkline of the five channels and the predicted retention curve, and the top ranked, timestamped recommendations.
+This prints the overall and per-platform scores with a confidence band, then the sub-scores: hook strength (itself broken into visual, text and audio components), predicted completion percentage, loopability, peak-end, arousal, uniqueness, and narrative-arc quality. Below that comes a text sparkline of the five channels alongside the predicted retention curve, and finally the top-ranked recommendations with timestamps.
 
 Useful flags:
 
@@ -85,7 +85,7 @@ Useful flags:
 python -m dashboard.server      # serves http://127.0.0.1:8000
 ```
 
-Upload a clip to see the video player with a synced multi-track brain-activation timeline, platform score gauges, the retention curve with drop-off risk zones highlighted, and a clickable list of fixes that seek the player to each timestamp.
+Upload a clip and you get the video player with a synced multi-track brain-activation timeline, platform score gauges, the retention curve with drop-off risk zones marked, and a clickable list of fixes that seeks the player to each timestamp.
 
 ### Other commands
 
@@ -96,15 +96,15 @@ neuroviral calibrate data.csv   # re-fit weights from your past-post analytics (
 
 ---
 
-## Design-for-calibration (build now, use later)
+## Design for calibration (build now, use later)
 
-Every run emits a **calibration record** (features + channel/dynamics metrics + scores) via `neuroviral/calibration/schema.py`. When you have real analytics from your own posts, feed a table of `video → views / retention / saves / shares` to:
+Every run emits a calibration record (features, channel and dynamics metrics, scores) through `neuroviral/calibration/schema.py`. Once you have real analytics from your own posts, feed a table of `video → views / retention / saves / shares` to:
 
 ```bash
 neuroviral calibrate my_posts.csv
 ```
 
-This re-fits the coefficients in `neuroviral/brain/weights.py` (ridge/logistic, scikit-learn) so scores learn *your* audience, writing `brain/weights_calibrated.json`, which is layered on top of the research defaults automatically. Until you supply data it is a no-op and research-derived weights are used. All tunable coefficients live in `weights.py`, so calibration only ever touches data — never pipeline code.
+That re-fits the coefficients in `neuroviral/brain/weights.py` using ridge or logistic regression from scikit-learn, so the scores learn your audience rather than a generic one. Results are written to `brain/weights_calibrated.json` and layered on top of the research defaults automatically. Until you supply data it does nothing and the research-derived weights stand. Every tunable coefficient lives in `weights.py`, which keeps calibration confined to data rather than pipeline code.
 
 ---
 
@@ -129,19 +129,22 @@ pip install -e ".[dev]"   # or: pip install pytest
 pytest
 ```
 
-The suite generates tiny synthetic clips with ffmpeg at test time (no committed binaries) and runs green **without downloading the large ML models** — extractors take their graceful-degradation paths, and unit tests exercise the brain/scoring layers directly. Tests needing ffmpeg skip automatically if it is absent.
+The suite generates tiny synthetic clips with ffmpeg at test time, so no binaries are committed, and it runs green without downloading the large ML models: extractors take their degradation paths and the unit tests exercise the brain and scoring layers directly. Tests that need ffmpeg skip themselves if it isn't installed.
 
 ---
 
-## Limitations & honesty guarantees
+## Limitations
 
-- **Not a real brain scan.** It's a research-informed simulation/proxy; the dashboard and every report say so.
-- **No network calls at score time** (privacy + fully-local by design).
-- Scores are **relative guidance**, not guaranteed view counts — presented with a confidence band and improvable via calibration.
-- Uncalibrated scores reflect general research heuristics, not your specific audience. Calibrate once you have post analytics.
+It is not a brain scan. It is a simulation built on research, and the dashboard and every report say so.
+
+Nothing goes over the network at score time, by design.
+
+The scores are relative guidance rather than predicted view counts, they come with a confidence band, and calibration is what improves them.
+
+Until you calibrate, the scores reflect general research heuristics rather than your specific audience, so treat them accordingly.
 
 ## Sources
 
-- Falk, Berkman & Lieberman (2012), neural focus group — <https://www.academia.edu/2790120/From_neural_responses_to_population_behavior_Neural_focus_group_predicts_population_level_media_effects_Emily_B_Falk_University_of_Michigan>
-- Tong et al. (2020), *PNAS*, brain activity forecasts video engagement — <http://web.stanford.edu/~genevsky/files/Tong_PNAS_2020.pdf>
-- Wu Tsai Neurosciences Institute, neuroforecasting overview — <https://neuroscience.stanford.edu/news/neuroforecasting-how-brain-activity-can-predict-stock-prices-or-viral-videos>
+- Falk, Berkman & Lieberman (2012), neural focus group: <https://www.academia.edu/2790120/From_neural_responses_to_population_behavior_Neural_focus_group_predicts_population_level_media_effects_Emily_B_Falk_University_of_Michigan>
+- Tong et al. (2020), *PNAS*, brain activity forecasts video engagement: <http://web.stanford.edu/~genevsky/files/Tong_PNAS_2020.pdf>
+- Wu Tsai Neurosciences Institute, neuroforecasting overview: <https://neuroscience.stanford.edu/news/neuroforecasting-how-brain-activity-can-predict-stock-prices-or-viral-videos>
