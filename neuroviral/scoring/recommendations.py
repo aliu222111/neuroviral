@@ -83,7 +83,8 @@ def generate(
             title="Open with a stronger visual",
             detail=(f"Visual hook is weak ({dyn.visual_hook:.2f}) in the first 3s. "
                     "Lead with motion, a fast first cut, a big face, or a bold "
-                    "on-screen text card — the eye commits before the ear does."),
+                    "on-screen text card. Viewers commit visually before the audio "
+                    "has had time to land."),
             t_start=0.0, t_end=3.0, channel="attention",
             est_lift=(0.55 - dyn.visual_hook) * 26,
         ))
@@ -93,7 +94,7 @@ def generate(
         recs.append(Recommendation(
             title="Front-load a curiosity-gap line",
             detail=(f"Scripted hook is weak ({dyn.text_hook:.2f}). Say the payoff-"
-                    "promise in the first sentence — a curiosity gap ('wait for "
+                    "promise in the first sentence, using a curiosity gap ('wait for "
                     "it…', 'here's why…') or a 'you/we' line lands the verbal hook "
                     "before viewers scroll."),
             t_start=0.0, t_end=3.0, channel="reward+language",
@@ -104,7 +105,7 @@ def generate(
     if dyn.audio_hook < 0.4:
         recs.append(Recommendation(
             title="Fix the opening audio energy",
-            detail=(f"Audio hook is weak ({dyn.audio_hook:.2f}) — likely dead air, "
+            detail=(f"Audio hook is weak ({dyn.audio_hook:.2f}), likely dead air, "
                     "a slow start, or monotone delivery in the first 3s. Start on a "
                     "loud beat/first word, cut pre-roll silence, and vary pitch."),
             t_start=0.0, t_end=3.0, channel="emotion+aversion",
@@ -148,7 +149,7 @@ def generate(
         recs.append(Recommendation(
             title="Raise emotional arousal",
             detail=(f"Peak arousal is muted ({dyn.arousal:.2f}). Vary vocal "
-                    "prosody/pace, add energetic music, or a reaction beat — flat "
+                    "prosody/pace, add energetic music, or a reaction beat. Flat "
                     "arousal predicts scroll-away and kills shares."),
             channel="emotion", est_lift=(0.5 - dyn.arousal) * 20,
         ))
@@ -170,7 +171,7 @@ def generate(
         recs.append(Recommendation(
             title="Land a stronger ending",
             detail=(f"The ending is low-energy (peak-end {dyn.peak_end:.2f}). The "
-                    "final beat disproportionately drives saves/shares — end on the "
+                    "final beat disproportionately drives saves/shares, so end on the "
                     "emotional peak, a punchline, or a clear CTA."),
             t_start=round(max(0.0, grid.duration - 2.0), 1),
             t_end=round(grid.duration, 1), channel="emotion+language", est_lift=10,
@@ -183,11 +184,11 @@ def generate(
             title="Sharpen the message / add relatability",
             detail=(f"Social-meaning activation is low ({lang_mean:.2f}). Add a "
                     "self-referential 'you/we' framing, a clearer takeaway, or a "
-                    "CTA — MPFC self-relevance drives sharing intention."),
+                    "CTA. MPFC self-relevance drives sharing intention."),
             channel="language", est_lift=8,
         ))
 
-    # 8. Low uniqueness — generic content.
+    # 8. Low uniqueness (generic content).
     if dyn.uniqueness < 0.4:
         recs.append(Recommendation(
             title="Say something the feed hasn't seen",
@@ -224,7 +225,7 @@ def generate(
     if dyn.storytelling < 0.5 and end_reward < 0.35:
         recs.append(Recommendation(
             title="Deliver the payoff you promised",
-            detail=("The arc builds but never resolves — reward is low at the finish. "
+            detail=("The arc builds but never resolves, leaving reward low at the finish. "
                     "End on the answer, reveal, or 'that's why…' beat so the story "
                     "closes. Unresolved arcs read as clickbait and kill re-shares."),
             t_start=round(max(0.0, grid.duration - 2.0), 1),
@@ -238,7 +239,7 @@ def generate(
             title="Add emotional highs and lows",
             detail=(f"Emotion stays flat (range {emo_range:.2f}) start to finish, so "
                     "even a well-structured story feels lifeless. Contrast a calm "
-                    "setup against an energetic reveal — variation is what makes an "
+                    "setup against an energetic reveal. Variation is what makes an "
                     "arc feel like a story."),
             channel="emotion", est_lift=10,
         ))

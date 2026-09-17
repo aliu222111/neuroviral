@@ -34,7 +34,7 @@ def extract(frames: List[np.ndarray], frame_fps: float, grid: TimeGrid) -> Extra
             res.series[name] = grid.full(0.0)
         res.series["color_contrast"] = grid.full(0.4)
         res.series["color_saturation"] = grid.full(0.4)
-        res.note("no video frames — vision features neutral", degraded=True)
+        res.note("no video frames, vision features neutral", degraded=True)
         return res
 
     times = np.arange(len(frames)) / frame_fps
@@ -89,7 +89,7 @@ def _detect_cuts(frames, times, motion_vals, res: ExtractResult) -> List[float]:
         pass
     # Frame-difference cut detector (PySceneDetect-style). A hard cut is a rising
     # local peak in content-change that clears an absolute floor and stands out
-    # from the local baseline — this is robust to busy footage (which a global
+    # from the local baseline, which is robust to busy footage (where a global
     # median+std threshold mis-handles, since one big jump inflates std above
     # itself and suppresses detection).
     m = np.asarray(motion_vals)

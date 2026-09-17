@@ -96,7 +96,7 @@ def _uniqueness(ch: Channels, features: dict) -> float:
     visual_variety = clamp01(0.5 * float(np.std(cut)) * 2.5
                              + 0.5 * float(np.std(mot)) * 2.5)
     if is_baseline:
-        # No real semantic signal — score on visual variety only, capped ~0.60.
+        # No real semantic signal, so score on visual variety only, capped ~0.60.
         return float(clamp01(0.15 + 0.45 * visual_variety))
 
     nov_mean = float(np.mean(nov))

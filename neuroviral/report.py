@@ -120,14 +120,14 @@ class Result:
     def to_terminal(self) -> str:
         lines = []
         lines.append("=" * 60)
-        lines.append(f"  NeuroViral  —  {self.video_path}")
+        lines.append(f"  NeuroViral: {self.video_path}")
         lines.append(f"  duration {self.duration:.1f}s   content-type: {self.content_type}"
                      + ("   [CALIBRATED]" if self.calibrated else ""))
         lines.append("=" * 60)
         for p, s in self.scores.items():
             bar = "█" * int(s.score / 5)
             lines.append(f"  {p.upper():7s}  {s.score:5.1f}/100  "
-                         f"[{s.low:.0f}–{s.high:.0f}]  conf {s.confidence:.2f}  {bar}")
+                         f"[{s.low:.0f}-{s.high:.0f}]  conf {s.confidence:.2f}  {bar}")
         lines.append("")
         d = self.dynamics
         lines.append("  Sub-scores:")
@@ -163,14 +163,14 @@ class Result:
 
     def to_markdown(self) -> str:
         d = self.dynamics
-        md = [f"# NeuroViral report — `{self.video_path}`", ""]
+        md = [f"# NeuroViral report for `{self.video_path}`", ""]
         md.append(f"*Duration {self.duration:.1f}s · content-type "
                   f"`{self.content_type}`*", )
         md.append("")
         md.append("| Platform | Score | Band | Confidence |")
         md.append("|---|---|---|---|")
         for p, s in self.scores.items():
-            md.append(f"| {p.upper()} | {s.score:.1f}/100 | {s.low:.0f}–{s.high:.0f} | {s.confidence:.2f} |")
+            md.append(f"| {p.upper()} | {s.score:.1f}/100 | {s.low:.0f}-{s.high:.0f} | {s.confidence:.2f} |")
         md.append("")
         md.append("## Sub-scores")
         md.append(f"- Hook (0-3s): **{d.hook*100:.1f}**")

@@ -4,7 +4,7 @@ Given a JSONL/CSV of :class:`CalibrationRecord`-shaped rows with a filled
 ``outcome`` (real views/retention), this fits a small regularized model mapping
 the derived sub-scores to the observed outcome, and writes multiplicative
 adjustments into ``brain/weights_calibrated.json`` (consumed by
-``weights.get_weights()``). Everything upstream is untouched — calibration only
+``weights.get_weights()``). Everything upstream is untouched, so calibration only
 ever changes data.
 
 Requires scikit-learn (``pip install -e ".[calibrate]"``). With zero labeled
@@ -174,7 +174,7 @@ def fit(
     base_dir = Path(data_path).resolve().parent
     X, y = _extract_xy(rows, platform, base_dir=base_dir)
     if len(X) < 3:
-        # Not enough labeled data — remain a research-derived no-op.
+        # Not enough labeled data, so remain a research-derived no-op.
         return None
 
     try:

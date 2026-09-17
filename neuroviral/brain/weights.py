@@ -1,21 +1,21 @@
 """Central home for EVERY tunable coefficient in NeuroViral.
 
 Design-for-calibration principle: the calibration re-fit (``calibration/fit.py``)
-only ever writes here (via :func:`load_overrides`) — it never touches pipeline
+only ever writes here (via :func:`load_overrides`) and never touches pipeline
 code. Research-derived defaults live in this file; a JSON override file produced
 by calibration is layered on top when present.
 
 Weight groups
 -------------
-* ``CHANNEL_FEATURE_WEIGHTS`` — linear map from extracted features to each of the
+* ``CHANNEL_FEATURE_WEIGHTS``: linear map from extracted features to each of the
   five neural channels (plus a bias). This encodes the mapping table in the spec.
-* ``CONTENT_TYPE_PROFILES`` — per-content-type channel gain multipliers
+* ``CONTENT_TYPE_PROFILES``: per-content-type channel gain multipliers
   (talking_head / edit / vlog / auto).
-* ``PLATFORM_WEIGHTS`` — how TikTok vs Reels weight the derived sub-scores.
-* ``DYNAMICS`` — decay / hook-window / loop parameters.
-* ``SUBSCORES`` — misc thresholds used when translating channels to sub-scores.
+* ``PLATFORM_WEIGHTS``: how TikTok vs Reels weight the derived sub-scores.
+* ``DYNAMICS``: decay / hook-window / loop parameters.
+* ``SUBSCORES``: misc thresholds used when translating channels to sub-scores.
 
-All feature series are 0–1 aligned to the common time grid. A missing feature is
+All feature series are 0-1 aligned to the common time grid. A missing feature is
 treated as its neutral baseline (see ``FEATURE_BASELINE``) so channels always
 compute even under graceful degradation.
 """

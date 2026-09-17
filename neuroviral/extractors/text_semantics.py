@@ -84,7 +84,7 @@ def extract(transcript, grid: TimeGrid) -> ExtractResult:
                      "sentiment_arousal", "payoff"):
             res.series[name] = grid.zeros()
         res.series["novelty"] = grid.full(0.3)
-        res.note("no transcript — text-semantic features neutral", degraded=True)
+        res.note("no transcript, text-semantic features neutral", degraded=True)
         return res
 
     tokens = [w.text for w in words]
@@ -162,7 +162,7 @@ def _novelty(words, times, grid: TimeGrid, res: ExtractResult) -> np.ndarray:
             sims = embs[:i] @ embs[i]
             novelty_vals.append(float(1.0 - np.max(sims)))
     except Exception:
-        res.note("sentence-transformers unavailable — lexical novelty fallback")
+        res.note("sentence-transformers unavailable, using lexical novelty fallback")
         seen = set()
         novelty_vals = []
         for ch in chunks:

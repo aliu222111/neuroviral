@@ -50,7 +50,7 @@ def extract(wave: Optional[AudioWaveform], grid: TimeGrid) -> ExtractResult:
         for name in ("rms_energy", "energy_buildup", "pitch_var", "monotone"):
             res.series[name] = grid.zeros()
         res.scalars["mean_energy"] = 0.0
-        res.note("no audio track — audio features neutral/zero", degraded=True)
+        res.note("no audio track, audio features neutral/zero", degraded=True)
         return res
 
     samples = np.asarray(wave.samples, dtype=np.float32)
@@ -115,7 +115,7 @@ def _pitch_variance(samples: np.ndarray, sr: int, grid: TimeGrid, res: ExtractRe
         series = safe_norm(resample_to_grid(var, times, grid, agg="mean"))
         return smooth(series, 3)
     except Exception:
-        res.note("librosa unavailable — pitch via zero-crossing proxy", degraded=False)
+        res.note("librosa unavailable, pitch via zero-crossing proxy", degraded=False)
         t_zcr, zcr = _frame_zcr(samples, sr)
         zseries = resample_to_grid(zcr, t_zcr, grid, agg="mean")
         return smooth(_local_variability(safe_norm(zseries)), 3)

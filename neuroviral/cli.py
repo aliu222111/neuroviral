@@ -64,7 +64,7 @@ def _cmd_calibrate(args) -> int:
     result = fit(args.data, platform=platform, out_path=args.out)
     if result is None:
         print("No usable labeled data (need >=3 rows with outcomes). "
-              "Weights unchanged — still using research-derived defaults.")
+              "Weights unchanged, still using research-derived defaults.")
         return 0
     print("Re-fit platform weights from labeled data:")
     print(json.dumps(result, indent=2))
@@ -99,7 +99,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="neuroviral",
         description="Fully-local, research-informed video virality predictor "
-                    "(brain-response SIMULATION/PROXY — not a real brain scan).",
+                    "(a simulation of brain response, not a real brain scan).",
     )
     p.add_argument("--version", action="version", version=f"neuroviral {__version__}")
     sub = p.add_subparsers(dest="command")

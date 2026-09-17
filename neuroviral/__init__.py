@@ -1,4 +1,4 @@
-"""NeuroViral — fully-local, research-informed social-media virality predictor.
+"""NeuroViral: a fully local, research-informed social-media virality predictor.
 
 This package extracts real audio/visual signals from a short-form video and maps
 them onto a research-grounded *simulation* of five neural/attention channels

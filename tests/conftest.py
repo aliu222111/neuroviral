@@ -34,7 +34,7 @@ def make_high_energy_clip(path: str, dur: float = 4.0):
 
 
 def make_slow_start_clip(path: str, dur: float = 4.0, dead: float = 2.5):
-    """Static, silent opening (dead air) then a little motion — weak hook."""
+    """Static, silent opening (dead air) then a little motion, a weak hook."""
     # First `dead` seconds: black + silence. Then testsrc + tone.
     cmd = [
         FFMPEG, "-y",
@@ -51,7 +51,7 @@ def make_slow_start_clip(path: str, dur: float = 4.0, dead: float = 2.5):
 
 
 def make_silent_short_clip(path: str, dur: float = 0.6):
-    """Very short, no audio track — edge case."""
+    """Very short, no audio track, an edge case."""
     cmd = [
         FFMPEG, "-y",
         "-f", "lavfi", "-i", f"testsrc=size=160x120:rate=30:duration={dur}",

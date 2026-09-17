@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>NeuroViral — local virality predictor</title>
+<title>NeuroViral: local virality predictor</title>
 <style>
   :root{
     --bg:#0e1013; --panel:#16191f; --ink:#e7eaf0; --muted:#8a91a0; --border:#242832;
@@ -99,7 +99,7 @@
 <div class="disclaimer">
   Research-informed <b>simulation</b>, not a brain scan. Real audio/visual signals are mapped onto a
   model of neural response grounded in neuroforecasting research (Falk et al. 2012; Tong et al. 2020,
-  PNAS). Scores are relative optimization guidance with a confidence band — not guaranteed views.
+  PNAS). Scores are relative optimization guidance with a confidence band, not guaranteed views.
 </div>
 
 <main>
@@ -132,10 +132,10 @@
   </section>
 
   <section class="panel">
-    <h3>PLATFORM SCORES <span class="muted">— out of 100</span></h3>
+    <h3>PLATFORM SCORES <span class="muted">out of 100</span></h3>
     <div id="gauges" class="gauges"><span class="muted">Upload a clip to see scores.</span></div>
     <div class="scalenote">
-      Each platform is scored <b>0–100</b> — a <b>relative optimization score</b> (how well the
+      Each platform is scored <b>0-100</b>. This is a <b>relative optimization score</b> (how well the
       clip's signals match what TikTok/Reels reward), <b>not</b> a predicted view count. The
       <b>band</b> is a confidence range; <b>conf</b> is how sure the model is.
     </div>
@@ -166,7 +166,7 @@
             novelty and build-up to a payoff. High reward = viewers want to see what happens next.</dd>
           <dt><i style="background:var(--attention)"></i>Attention</dt>
           <dd><b>Visual salience</b> that holds the eye. Driven by motion, cut rate, face size,
-            contrast and on-screen text — this is what wins the first-3s hold.</dd>
+            contrast and on-screen text. This is what wins the first-3s hold.</dd>
           <dt><i style="background:var(--emotion)"></i>Emotion</dt>
           <dd><b>Emotional arousal</b> (amygdala/insula). Driven by audio energy, vocal
             pitch/pace, expression intensity and sentiment. High arousal predicts sharing.</dd>
@@ -175,7 +175,7 @@
             starts, low motion, monotone and over-long shots. <b>Lower is better.</b></dd>
           <dt><i style="background:var(--language)"></i>Language</dt>
           <dd><b>Meaning &amp; relatability</b> (MPFC/language areas). Driven by self-reference,
-            clarity, a clear message/CTA and novelty — this drives comments and sharing intent.</dd>
+            clarity, a clear message/CTA and novelty, which drive comments and sharing intent.</dd>
         </dl>
         <div class="muted" style="margin-top:6px">These are a research-informed <b>simulation</b>
           of neural response, not a real brain scan.</div>
@@ -228,11 +228,11 @@ function analyze(){
     if(!e.lengthComputable) return;
     const p = Math.round(e.loaded/e.total*100);
     fill.style.width = p+"%";
-    pct.textContent = p<100 ? ("Uploading… "+p+"%") : "Uploaded — analyzing…";
+    pct.textContent = p<100 ? ("Uploading… "+p+"%") : "Uploaded, analyzing…";
   });
   // Upload done; server is now analyzing (no byte stream for that phase).
   xhr.upload.addEventListener("load", ()=>{
-    fill.style.width="100%"; pct.textContent="Uploaded — analyzing…";
+    fill.style.width="100%"; pct.textContent="Uploaded, analyzing…";
     $("#spinner").style.display="block";
   });
   xhr.addEventListener("load", ()=>{
@@ -307,7 +307,7 @@ function renderGauges(){
     const el = document.createElement("div"); el.className="gauge";
     el.innerHTML = `<div class="plat">${p}</div>
       <div class="num">${s.score.toFixed(0)}</div>
-      <div class="band">band ${s.band[0].toFixed(0)}–${s.band[1].toFixed(0)} · conf ${s.confidence.toFixed(2)}</div>`;
+      <div class="band">band ${s.band[0].toFixed(0)}-${s.band[1].toFixed(0)} · conf ${s.confidence.toFixed(2)}</div>`;
     g.appendChild(el);
   }
 }
@@ -318,7 +318,7 @@ function renderSubs(){
   const hook = document.createElement("div"); hook.className="sub sub-hook";
   hook.innerHTML = `<div class="hookrow">
       <span class="v">${(d.hook*100).toFixed(0)}</span>
-      <span class="l">Hook (0–3s)</span>
+      <span class="l">Hook (0-3s)</span>
       <span class="parts">
         <span>visual <b>${(d.visual_hook*100).toFixed(0)}</b></span>
         <span>text <b>${(d.text_hook*100).toFixed(0)}</b></span>
@@ -382,7 +382,7 @@ function drawRetention(){
     const x0=(z.start/dur)*W, x1=(z.end/dur)*W;
     ctx.fillStyle="rgba(181,23,158,0.22)"; ctx.fillRect(x0,0,Math.max(2,x1-x0),plotH);
     ctx.fillStyle="#e879d0"; ctx.font="9px sans-serif"; ctx.textAlign="left";
-    ctx.fillText(`${fmtTime(z.start)}–${fmtTime(z.end)}`, x0+3, 11);
+    ctx.fillText(`${fmtTime(z.start)}-${fmtTime(z.end)}`, x0+3, 11);
   });
   const arr=DATA.retention_curve;
   ctx.beginPath();

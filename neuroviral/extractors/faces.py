@@ -89,7 +89,7 @@ def extract(frames: List[np.ndarray], frame_fps: float, grid: TimeGrid) -> Extra
         res.series["face_presence"] = grid.zeros()
         res.series["face_size"] = grid.zeros()
         res.series["expression_intensity"] = grid.full(0.3)
-        res.note("no frames — face features neutral", degraded=True)
+        res.note("no frames, face features neutral", degraded=True)
         return res
 
     boxes = _detect_mediapipe(frames)
@@ -101,7 +101,7 @@ def extract(frames: List[np.ndarray], frame_fps: float, grid: TimeGrid) -> Extra
         res.series["face_presence"] = grid.zeros()
         res.series["face_size"] = grid.zeros()
         res.series["expression_intensity"] = grid.full(0.3)
-        res.note("no face detector available (mediapipe/opencv) — faces neutral",
+        res.note("no face detector available (mediapipe/opencv), faces neutral",
                  degraded=True)
         return res
 
